@@ -21,7 +21,7 @@ class LoginController extends Controller
         $token = $user->createToken('api-token')->plainTextToken;
         return [
             'token' => $token,
-            'user' => $user,
+            'user' => $user->load('profile'),
         ];
     }
 

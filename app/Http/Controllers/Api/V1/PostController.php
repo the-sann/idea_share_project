@@ -16,7 +16,13 @@ class PostController extends Controller
     public function index()
     {
         $user = request()->user();
-        $posts = $user->posts()->paginate(10);
+        $posts = $user->posts()
+            ->with([
+                'author.profile',
+                'category'
+            ])
+            ->paginate(10);
+
         return PostResource::collection($posts);
     }
 
@@ -26,9 +32,15 @@ class PostController extends Controller
     public function store(StorePostRequest $request)
     {
         $data = $request->validated();
-        // $data['author_id'] = $request->user()->id; 
-        $data['author_id'] = $request->user()->id; // Set the author_id to the authenticated user's ID
+        $data['author_id'] = $request->user()->id;
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('posts', 'public');
+        }
         $post = Post::create($data);
+        $post->load([
+            'author.profile',
+            'category',
+        ]);
         return new PostResource($post);
     }
 

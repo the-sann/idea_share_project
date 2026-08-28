@@ -20,6 +20,8 @@ class ProfileResource extends JsonResource
             'career' => $this->career,
             'location' => $this->location,
             'profile_image' => $this->profile_image,
+            'followers_count' => $this->user->followers()->count(),
+            'following_count' => $this->user->following()->count(),
         ];
     }
 }

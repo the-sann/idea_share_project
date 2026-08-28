@@ -7,6 +7,7 @@ use App\Http\Requests\StorePostRequest;
 use App\Http\Resources\PostResource;
 use App\Models\Post;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class PostController extends Controller
 {
@@ -15,13 +16,11 @@ class PostController extends Controller
      */
     public function index()
     {
-        $user = request()->user();
-        $posts = $user->posts()
-            ->with([
-                'author.profile',
-                'category'
-            ])
-            ->paginate(10);
+
+        $posts = Post::with([
+            'author.profile',
+            'category',
+        ])->latest()->paginate(20);
 
         return PostResource::collection($posts);
     }
@@ -33,6 +32,8 @@ class PostController extends Controller
     {
         $data = $request->validated();
         $data['author_id'] = $request->user()->id;
+
+        $data['slug'] = Str::slug($data['title']) . '-' . Str::random(6);
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('posts', 'public');
         }
@@ -47,10 +48,12 @@ class PostController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Post $post)
-
+    public function show(string $username, Post $post)
     {
-        abort_if($post->author_id !== Auth::id(), 403, 'Unauthorized access to this post.');
+        // abort_if($post->author_id !== Auth::id() ||
+        //     $post->author->username !== $username, 403, 'Unauthorized access to this post.');
+        $post->load('author.profile');
+
         return new PostResource($post);
     }
 

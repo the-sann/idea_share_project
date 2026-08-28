@@ -11,7 +11,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-#[Fillable(['name', 'email', 'password'])]
+#[Fillable(['name', 'email', 'password', 'username'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -28,6 +28,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'username' => 'string'
         ];
     }
     public function posts()
@@ -41,5 +42,42 @@ class User extends Authenticatable
     public function profile()
     {
         return $this->hasOne(Profile::class);
+    }
+
+    // following is the currunt user following other users
+
+    // Users that this user is following
+    public function following()
+    {
+        return $this->belongsToMany(
+            User::class,
+            'followers',
+            'follower_id',
+            'user_id'
+        );
+    }
+
+    // Users who are following this user
+    public function followers()
+    {
+        return $this->belongsToMany(
+            User::class,
+            'followers',
+            'user_id',
+            'follower_id'
+        );
+    }
+    public function isFollowedBy(User $user)
+    {
+        return $this->followers()
+            ->where('users.id', $user->id)
+            ->exists();
+    }
+    public function imageUrl()
+    {
+        if ($this->image) {
+            return asset('storage/' . $this->image);
+        }
+        return null;
     }
 }

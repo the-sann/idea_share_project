@@ -22,6 +22,7 @@ class PostResource extends JsonResource
             'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
             'author' => new UserResource($this->whenLoaded('author')),
             'image' => $this->image,
+            'slug' => $this->slug,
             'category' => [
                 'id' => $this->category?->id,
                 'name' => $this->category?->name,

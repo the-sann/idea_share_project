@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\PromptGenerationController;
 use App\Http\Controllers\Api\V1\PublicProfileController;
 use App\Http\Controllers\FollowerController;
 use App\Http\Controllers\UserController;
+use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -19,6 +20,7 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
     Route::prefix('v1')->group(function () {
         Route::apiResource('posts', PostController::class)->except(['show']);
         Route::apiResource('categories', CategoryController::class)->only(['index']);
+        Route::get('/category/{category}', [PostController::class, 'category']);
         Route::post('/follow/{user:username}', [FollowerController::class, 'followUnfollow']);
     });
 });

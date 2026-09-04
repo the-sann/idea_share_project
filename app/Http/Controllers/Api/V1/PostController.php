@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Resources\PostResource;
+use App\Models\Category;
 use App\Models\Post;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -76,5 +77,10 @@ class PostController extends Controller
         abort_if($post->author_id !== Auth::id(), 403, 'Unauthorized access to this post.');
         $post->delete();
         return response()->json(['message' => 'Post deleted successfully']);
+    }
+    public function category(Category $category)
+    {
+        $post = $category->posts()->simplePaginate(20);
+        return PostResource::collection($post);
     }
 }

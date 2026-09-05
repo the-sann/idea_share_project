@@ -80,7 +80,10 @@ class PostController extends Controller
     }
     public function category(Category $category)
     {
-        $post = $category->posts()->simplePaginate(20);
-        return PostResource::collection($post);
+        $posts = $category->posts()
+            ->with(['author.profile', 'category'])
+            ->simplePaginate(20);
+
+        return PostResource::collection($posts);
     }
 }

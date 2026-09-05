@@ -80,4 +80,14 @@ class User extends Authenticatable
         }
         return null;
     }
+    public function likes()
+    {
+        return $this->hasMany(Like::class);
+    }
+    public function hasLiked(Post $post)
+    {
+        return $this->likes()
+            ->where('post_id', $post->id)
+            ->exists();
+    }
 }
